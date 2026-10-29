@@ -104,9 +104,11 @@ try {
     file_put_contents($projSec . '/app.php', "<?php echo 'ok';\n");
     file_put_contents($projSec . '/.env', "DB_PASSWORD=super_secret_production_password\n");
     file_put_contents($projSec . '/.env.local', "API_KEY=secret_local_key\n");
+    file_put_contents($projSec . '/config.local.php', "<?php return ['secret' => '123'];\n");
     file_put_contents($projSec . '/server.pem', "-----BEGIN CERTIFICATE-----\nSECRET\n-----END CERTIFICATE-----\n");
     file_put_contents($projSec . '/ssl.key', "-----BEGIN RSA PRIVATE KEY-----\nKEY\n-----END RSA PRIVATE KEY-----\n");
     file_put_contents($projSec . '/id_rsa', "ssh-rsa AAAAB3NzaC1yc2EAAAADAQAB...\n");
+    file_put_contents($projSec . '/id_ed25519', "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5...\n");
     file_put_contents($projSec . '/.DS_Store', "Mac Finder metadata bytes");
     file_put_contents($projSec . '/Thumbs.db', "Windows Explorer cache bytes");
     file_put_contents($projSec . '/composer.json', '{"name": "test/secrets"}');
@@ -120,9 +122,11 @@ try {
     assertCondition(isset($scannedFiles['composer.json']), "composer.json is scanned");
     assertCondition(!isset($scannedFiles['.env']), "Sensitive .env is excluded by default");
     assertCondition(!isset($scannedFiles['.env.local']), "Sensitive .env.local is excluded by default");
+    assertCondition(!isset($scannedFiles['config.local.php']), "Sensitive config.local.php is excluded by default");
     assertCondition(!isset($scannedFiles['server.pem']), "Sensitive .pem certificate is excluded by default");
     assertCondition(!isset($scannedFiles['ssl.key']), "Sensitive .key private key is excluded by default");
     assertCondition(!isset($scannedFiles['id_rsa']), "Sensitive SSH private key id_rsa is excluded by default");
+    assertCondition(!isset($scannedFiles['id_ed25519']), "Sensitive SSH private key id_ed25519 is excluded by default");
     assertCondition(!isset($scannedFiles['.DS_Store']), "OS garbage file .DS_Store is excluded by default");
     assertCondition(!isset($scannedFiles['Thumbs.db']), "OS garbage file Thumbs.db is excluded by default");
     assertCondition(!isset($scannedFiles['.git/config']), "Repository metadata .git is excluded by default");
