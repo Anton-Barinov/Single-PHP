@@ -321,6 +321,9 @@ Startup latency comparison across standalone packagers on macOS Apple Silicon:
 
 ## 🔗 Related Projects by Anton Barinov
 
+- 📦 **[PHP-to-Binary](https://github.com/Anton-Barinov/PHP-to-Binary)**: Compile any PHP script into a standalone native binary with embedded micro runtime (Linux, macOS, Windows).
+- 🛡️ **[Composer-Audit-ZeroTrust](https://github.com/Anton-Barinov/Composer-Audit-ZeroTrust)**: Supply-Chain Security & Typosquatting Auditor for Composer dependencies.
+- 🛡️ **[EOL-PHP-Armor](https://github.com/Anton-Barinov/EOL-PHP-Armor)**: 1-line automated security hub & hotpatching engine for EOL PHP (5.4–8.1).
 - ⚡ **[PHP-MCP](https://github.com/Anton-Barinov/PHP-MCP)**: Universal Zero-Dependency Model Context Protocol framework for PHP.
 - 🛡️ **[PHP-Hardening-Kit](https://github.com/Anton-Barinov/PHP-Hardening-Kit)**: Universal runtime security shield protecting PHP against zero-days and legacy exploits.
 - 🐳 **[EOL-PHP-SecAuto](https://github.com/Anton-Barinov/EOL-PHP-SecAuto)**: Automated CLI & GitHub Action for patching legacy Docker images.
