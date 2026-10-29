@@ -9,7 +9,7 @@ use Throwable;
 
 class Application
 {
-    public const VERSION = '1.0.0';
+    public const VERSION = '1.1.0';
 
     public function run(array $argv): int
     {
@@ -74,6 +74,18 @@ class Application
             }
             if (isset($parsed['options']['target'])) {
                 $options['target'] = $parsed['options']['target'];
+            }
+            if (isset($parsed['options']['minify'])) {
+                $options['minify'] = true;
+            }
+
+            // Extract custom --ini:key=val and --env:key=val
+            foreach ($parsed['options'] as $optKey => $optVal) {
+                if (str_starts_with($optKey, 'ini:')) {
+                    $options['ini'][substr($optKey, 4)] = (string)$optVal;
+                } elseif (str_starts_with($optKey, 'env:')) {
+                    $options['env'][substr($optKey, 4)] = (string)$optVal;
+                }
             }
 
             $config = Config::fromDir($dir, $options);
@@ -242,6 +254,9 @@ Options for build:
   --output=<path>            Output binary path (default: dist/<name>)
   --engine=<micro|franken|phar> Packaging engine (default: micro)
   --target=<target>          Target architecture (host, linux-x86_64, macos-arm64, etc.)
+  --minify                   Strip comments and whitespace from PHP files (tree-shaking)
+  --ini:<key>=<val>          Embed custom php.ini configuration (e.g. --ini:memory_limit=1G)
+  --env:<key>=<val>          Embed default environment variable (e.g. --env:APP_ENV=prod)
 
 Examples:
   # Pack current directory into a standalone binary:

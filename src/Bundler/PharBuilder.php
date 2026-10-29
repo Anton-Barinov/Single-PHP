@@ -44,6 +44,13 @@ class PharBuilder
 
         // 1. Add all scanned project files
         foreach ($files as $relPath => $absPath) {
+            if ($this->config->isMinify() && str_ends_with($relPath, '.php')) {
+                $stripped = @php_strip_whitespace($absPath);
+                if ($stripped !== false && $stripped !== '') {
+                    $phar->addFromString($relPath, $stripped);
+                    continue;
+                }
+            }
             $phar->addFile($absPath, $relPath);
         }
 
@@ -87,6 +94,11 @@ class PharBuilder
             $iniStatements .= "ini_set(" . var_export((string)$key, true) . ", " . var_export((string)$val, true) . ");\n";
         }
 
+        $envStatements = '';
+        foreach ($this->config->getEnv() as $k => $v) {
+            $envStatements .= "putenv(" . var_export("{$k}={$v}", true) . "); \$_ENV[" . var_export((string)$k, true) . "] = " . var_export((string)$v, true) . ";\n";
+        }
+
         return <<<STUB
 #!/usr/bin/env php
 <?php
@@ -97,6 +109,27 @@ class PharBuilder
 Phar::mapPhar('{$alias}');
 
 {$iniStatements}
+{$envStatements}
+
+// Auto-load embedded .env file if present
+if (file_exists('phar://{$alias}/.env')) {
+    \$envLines = file('phar://{$alias}/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if (\$envLines !== false) {
+        foreach (\$envLines as \$line) {
+            \$line = trim(\$line);
+            if (\$line !== '' && !str_starts_with(\$line, '#') && str_contains(\$line, '=')) {
+                [\$k, \$v] = explode('=', \$line, 2);
+                \$k = trim(\$k);
+                \$v = trim(\$v, " \t\n\r\0\x0B\"'");
+                if (getenv(\$k) === false) {
+                    putenv("{\$k}={\$v}");
+                    \$_ENV[\$k] = \$v;
+                    \$_SERVER[\$k] = \$v;
+                }
+            }
+        }
+    }
+}
 
 // Check for vendor/autoload.php in phar
 if (file_exists('phar://{$alias}/vendor/autoload.php')) {

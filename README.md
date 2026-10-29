@@ -155,6 +155,9 @@ Options for build:
   --output=<path>            Output binary path (default: dist/<name>)
   --engine=<micro|franken|phar> Packaging engine (default: micro)
   --target=<target>          Target architecture (host, linux-x86_64, macos-arm64, etc.)
+  --minify                   Strip comments and whitespace from PHP code (tree-shaking)
+  --ini:<key>=<val>          Embed custom php.ini configuration (e.g. --ini:memory_limit=1G)
+  --env:<key>=<val>          Embed default environment variable (e.g. --env:APP_ENV=prod)
 ```
 
 ### Inspecting a Compiled Binary

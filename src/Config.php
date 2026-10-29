@@ -20,6 +20,8 @@ class Config
     private array $include;
     private array $extensions;
     private array $phpIni;
+    private array $env;
+    private bool $minify;
 
     public function __construct(string $projectDir, array $options = [])
     {
@@ -52,21 +54,40 @@ class Config
             ?? $configJson['entrypoint']
             ?? $this->detectEntrypoint($composer);
 
-        // 6. Resolve Output Binary Path
+        // 6. Resolve Target Architecture
+        $this->target = strtolower($options['target']
+            ?? $configJson['target']
+            ?? 'host');
+
+        // 7. Resolve Output Binary Path
         $defaultOutput = 'dist/' . preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $this->name);
+        if ($this->target === 'windows-x64' && !str_ends_with($defaultOutput, '.exe')) {
+            $defaultOutput .= '.exe';
+        }
+
         $this->output = $options['output']
             ?? $configJson['output']
             ?? $defaultOutput;
 
-        // 7. Resolve Engine (micro, franken, phar)
+        if ($this->target === 'windows-x64' && !str_ends_with($this->output, '.exe')) {
+            $this->output .= '.exe';
+        }
+
+        // 8. Resolve Engine (micro, franken, phar)
         $this->engine = strtolower($options['engine']
             ?? $configJson['engine']
             ?? 'micro');
 
-        // 8. Resolve Target Architecture
-        $this->target = strtolower($options['target']
-            ?? $configJson['target']
-            ?? 'host');
+        // 9. Minify flag
+        $this->minify = (bool)($options['minify']
+            ?? $configJson['minify']
+            ?? false);
+
+        // 10. Environment variables
+        $this->env = array_merge(
+            $configJson['env'] ?? [],
+            $options['env'] ?? []
+        );
 
         // 9. Exclude patterns
         $defaultExclude = [
@@ -225,6 +246,16 @@ class Config
         return $this->phpIni;
     }
 
+    public function isMinify(): bool
+    {
+        return $this->minify;
+    }
+
+    public function getEnv(): array
+    {
+        return $this->env;
+    }
+
     public function toArray(): array
     {
         return [
@@ -234,6 +265,8 @@ class Config
             'engine'     => $this->engine,
             'target'     => $this->target,
             'output'     => $this->output,
+            'minify'     => $this->minify,
+            'env'        => $this->env,
             'extensions' => $this->extensions,
             'exclude'    => $this->exclude,
             'ini'        => $this->phpIni,

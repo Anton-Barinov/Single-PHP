@@ -36,4 +36,23 @@ assert($customConfig->getEngine() === 'phar');
 assert($customConfig->getTarget() === 'linux-x86_64');
 echo "  ✓ Manual configuration overrides passed\n";
 
+// 3. Test Windows target adds .exe suffix
+$winConfig = new Config($exampleDir, [
+    'target' => 'windows-x64',
+    'output' => 'dist/winapp'
+]);
+assert(str_ends_with($winConfig->getOutput(), '.exe'), "Windows binary should end with .exe, got {$winConfig->getOutput()}");
+echo "  ✓ Windows target automatically ensures .exe extension\n";
+
+// 4. Test minify and env configuration
+$envConfig = new Config($exampleDir, [
+    'minify' => true,
+    'env'    => ['APP_ENV' => 'production', 'DB_HOST' => '10.0.0.1'],
+    'ini'    => ['memory_limit' => '1024M'],
+]);
+assert($envConfig->isMinify() === true, 'Minify should be enabled');
+assert($envConfig->getEnv()['APP_ENV'] === 'production');
+assert($envConfig->getPhpIni()['memory_limit'] === '1024M');
+echo "  ✓ Minify and custom env configuration passed\n";
+
 echo "ConfigTest passed successfully! ✅\n";
