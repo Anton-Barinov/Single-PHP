@@ -52,9 +52,12 @@ class Linter
         if (!str_starts_with($output, '/')) {
             $output = $this->config->getProjectDir() . '/' . $output;
         }
-        $outDir = dirname($output);
-        if (file_exists($outDir) && !is_writable($outDir)) {
-            $errors[] = "Output directory is not writable: {$outDir}";
+        $targetDir = dirname($output);
+        while (!file_exists($targetDir) && $targetDir !== '/' && dirname($targetDir) !== $targetDir) {
+            $targetDir = dirname($targetDir);
+        }
+        if (file_exists($targetDir) && !is_writable($targetDir)) {
+            $errors[] = "Output directory or parent path is not writable: {$targetDir}";
         }
 
         return [

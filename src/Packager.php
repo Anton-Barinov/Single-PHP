@@ -36,6 +36,14 @@ class Packager
     }
 
     /**
+     * Executes the full packaging workflow (alias for package)
+     */
+    public function build(?callable $logger = null): array
+    {
+        return $this->package($logger);
+    }
+
+    /**
      * Executes the full packaging workflow
      *
      * @param callable|null $logger Optional callback for progress logging fn(string $msg)

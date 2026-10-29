@@ -11,6 +11,7 @@ $files = [
     __DIR__ . '/PackagerTest.php',
     __DIR__ . '/DoctorTest.php',
     __DIR__ . '/LinterTest.php',
+    __DIR__ . '/ChaosPackagerTest.php',
 ];
 
 $failed = 0;
