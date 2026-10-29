@@ -89,12 +89,19 @@ class Config
             $options['env'] ?? []
         );
 
-        // 9. Exclude patterns
+        // 9. Exclude patterns (including sensitive secrets and OS artifacts by default)
         $defaultExclude = [
             '.git',
             '.github',
             '.idea',
             '.vscode',
+            '.DS_Store',
+            'Thumbs.db',
+            '.env',
+            '.env.local',
+            '*.pem',
+            '*.key',
+            'id_rsa*',
             'tests',
             'test',
             'phpunit.xml',

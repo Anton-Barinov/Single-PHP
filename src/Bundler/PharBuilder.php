@@ -99,7 +99,7 @@ class PharBuilder
             $envStatements .= "putenv(" . var_export("{$k}={$v}", true) . "); \$_ENV[" . var_export((string)$k, true) . "] = " . var_export((string)$v, true) . ";\n";
         }
 
-        return <<<STUB
+        $stub = <<<STUB
 #!/usr/bin/env php
 <?php
 /**
@@ -110,6 +110,13 @@ Phar::mapPhar('{$alias}');
 
 {$iniStatements}
 {$envStatements}
+
+// Define Single-PHP runtime constants
+if (!defined('SINGLE_PHP_RUNNING')) {
+    define('SINGLE_PHP_RUNNING', true);
+    define('SINGLE_PHP_PHAR_ALIAS', '{$alias}');
+    define('SINGLE_PHP_APP_ROOT', 'phar://{$alias}');
+}
 
 // Auto-load embedded .env file if present
 if (file_exists('phar://{$alias}/.env')) {
@@ -136,10 +143,18 @@ if (file_exists('phar://{$alias}/vendor/autoload.php')) {
     require_once 'phar://{$alias}/vendor/autoload.php';
 }
 
-// Execute Entrypoint
-require 'phar://{$alias}/{$entrypoint}';
+// Execute Entrypoint with exit code forwarding
+// Note: In PHP, require returns 1 if no explicit return is provided.
+// Only explicit non-1 integer returns are treated as custom exit codes.
+\$exitCode = require 'phar://{$alias}/{$entrypoint}';
+if (is_int(\$exitCode) && \$exitCode !== 1) {
+    exit(\$exitCode);
+}
 
 __HALT_COMPILER();
 STUB;
+
+        // Ensure strictly normalized Unix LF line endings (prevent Linux CRLF shebang failure)
+        return str_replace(["\r\n", "\r"], "\n", $stub);
     }
 }
