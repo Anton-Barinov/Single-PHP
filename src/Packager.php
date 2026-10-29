@@ -48,7 +48,14 @@ class Packager
 
         $log("Scanning project files in {$this->config->getProjectDir()}...");
 
-        // 1. Scan files
+        // 1. Run pre-build linter
+        $linter = new Linter($this->config);
+        $lintResult = $linter->check();
+        if (!$lintResult['valid']) {
+            throw new RuntimeException("Pre-build check failed:\n  - " . implode("\n  - ", $lintResult['errors']));
+        }
+
+        // 2. Scan files
         $scanner = new ProjectScanner(
             $this->config->getProjectDir(),
             $this->config->getExclude(),
@@ -60,9 +67,14 @@ class Packager
             throw new RuntimeException("No files found to package in {$this->config->getProjectDir()}");
         }
 
-        $log("✓ Found " . count($files) . " project files");
+        $uncompressedSize = 0;
+        foreach ($files as $filePath) {
+            $uncompressedSize += filesize($filePath);
+        }
 
-        // 2. Build intermediate Phar payload
+        $log("✓ Found " . count($files) . " project files (" . round($uncompressedSize / 1024, 2) . " KB)");
+
+        // 3. Build intermediate Phar payload
         $tempPhar = sys_get_temp_dir() . '/single_php_' . uniqid() . '.phar';
         $log("Building compressed payload archive...");
 
@@ -104,15 +116,16 @@ class Packager
         $log("✓ Standalone binary created at {$finalBinary} (" . round($finalSize / 1024 / 1024, 2) . " MB) in {$elapsed}s");
 
         return [
-            'name'        => $this->config->getName(),
-            'version'     => $this->config->getVersion(),
-            'engine'      => $engineName,
-            'target'      => $target,
-            'filesCount'  => count($files),
-            'pharSize'    => $pharSize,
-            'binarySize'  => $finalSize,
-            'outputPath'  => $finalBinary,
-            'elapsedSec'  => $elapsed,
+            'name'             => $this->config->getName(),
+            'version'          => $this->config->getVersion(),
+            'engine'           => $engineName,
+            'target'           => $target,
+            'filesCount'       => count($files),
+            'uncompressedSize' => $uncompressedSize,
+            'pharSize'         => $pharSize,
+            'binarySize'       => $finalSize,
+            'outputPath'       => $finalBinary,
+            'elapsedSec'       => $elapsed,
         ];
     }
 }

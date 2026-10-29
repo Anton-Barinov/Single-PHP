@@ -143,6 +143,8 @@ Usage:
 Commands:
   build [dir]                Compile project into a single standalone binary
   init [dir]                 Generate a single-php.json configuration file
+  check [dir]                Lint and validate project structure & entrypoint syntax
+  doctor                     Run system diagnostic check for compilers & extensions
   inspect <binary>           Inspect embedded metadata and files inside a binary
   extract <binary> [dest]    Unpack a compiled binary back into source files
   targets                    List supported target architectures
@@ -187,6 +189,18 @@ Output:
 ### Extracting a Binary Back to Source Code
 ```bash
 single-php extract dist/sample-hello-cli ./extracted
+```
+
+### System Diagnostics (Doctor)
+Verify that your host system satisfies all requirements (PHP >= 8.1, Phar extension, write permissions, compression algorithms):
+```bash
+single-php doctor
+```
+
+### Pre-Build Project Linter (Check)
+Lint entrypoints, PHP syntax errors (`php -l`), and configuration files before attempting compilation:
+```bash
+single-php check ./my-project
 ```
 
 ---

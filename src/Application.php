@@ -9,7 +9,7 @@ use Throwable;
 
 class Application
 {
-    public const VERSION = '1.1.0';
+    public const VERSION = '1.2.0';
 
     public function run(array $argv): int
     {
@@ -37,6 +37,12 @@ class Application
 
             case 'download-engines':
                 return $this->commandDownloadEngines($parsed);
+
+            case 'doctor':
+                return $this->commandDoctor();
+
+            case 'check':
+                return $this->commandCheck($parsed);
 
             case 'version':
             case '-v':
@@ -221,6 +227,67 @@ class Application
         }
     }
 
+    private function commandDoctor(): int
+    {
+        echo "\n🏥 Single-PHP System Diagnostics\n";
+        echo "=========================================================\n";
+
+        $doctor = new Doctor();
+        $checks = $doctor->diagnose();
+        $hasErrors = false;
+
+        foreach ($checks as $c) {
+            $icon = match ($c['status']) {
+                'ok'      => '✅',
+                'warning' => '⚠️ ',
+                'info'    => 'ℹ️ ',
+                default   => '❌',
+            };
+            if ($c['status'] === 'error') {
+                $hasErrors = true;
+            }
+            echo "  {$icon} {$c['title']}: {$c['message']}\n";
+        }
+
+        echo "---------------------------------------------------------\n";
+        if ($hasErrors) {
+            echo "Doctor found issues that may prevent building binaries.\n\n";
+            return 1;
+        }
+
+        echo "All systems ready for building standalone binaries! 🎉\n\n";
+        return 0;
+    }
+
+    private function commandCheck(array $parsed): int
+    {
+        $dir = $parsed['positionals'][1] ?? '.';
+        $dir = realpath($dir) ?: $dir;
+
+        echo "\n🔍 Checking project in {$dir}...\n";
+
+        try {
+            $config = Config::fromDir($dir);
+            $linter = new Linter($config);
+            $result = $linter->check();
+
+            if (!$result['valid']) {
+                echo "\n❌ Check Failed:\n";
+                foreach ($result['errors'] as $err) {
+                    echo "  - {$err}\n";
+                }
+                echo "\n";
+                return 1;
+            }
+
+            echo "✓ Project structure, entrypoint syntax, and config are valid! Ready to build.\n\n";
+            return 0;
+        } catch (Throwable $e) {
+            echo "❌ Check Error: " . $e->getMessage() . "\n\n";
+            return 1;
+        }
+    }
+
     private function printBanner(): void
     {
         $version = self::VERSION;
@@ -242,6 +309,8 @@ Usage:
 Commands:
   build [dir]                Compile project into a single standalone binary
   init [dir]                 Generate a single-php.json configuration file
+  check [dir]                Lint and validate project structure & entrypoint syntax
+  doctor                     Run system diagnostic check for compilers & extensions
   inspect <binary>           Inspect embedded metadata and files inside a binary
   extract <binary> [dest]    Unpack a compiled binary back into source files
   targets                    List supported target architectures

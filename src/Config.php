@@ -159,7 +159,7 @@ class Config
         // 1. Check composer bin property
         if (isset($composer['bin'])) {
             $bins = (array)$composer['bin'];
-            if (!empty($bins) && is_string($bins[0]) && file_exists($this->projectDir . '/' . $bins[0])) {
+            if (!empty($bins) && is_string($bins[0])) {
                 return $bins[0];
             }
         }

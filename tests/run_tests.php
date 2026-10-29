@@ -9,6 +9,8 @@ $files = [
     __DIR__ . '/PharBuilderTest.php',
     __DIR__ . '/InspectorTest.php',
     __DIR__ . '/PackagerTest.php',
+    __DIR__ . '/DoctorTest.php',
+    __DIR__ . '/LinterTest.php',
 ];
 
 $failed = 0;
