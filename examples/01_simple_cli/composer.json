@@ -1,0 +1,6 @@
+{
+  "name": "sample/hello-cli",
+  "description": "Simple CLI example for Single-PHP",
+  "version": "1.0.0",
+  "bin": ["app.php"]
+}

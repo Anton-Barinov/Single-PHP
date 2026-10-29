@@ -1,0 +1,11 @@
+{
+  "name": "acme/cli-calculator",
+  "description": "Multi-file CLI Calculator bundled with Single-PHP",
+  "version": "2.1.0",
+  "bin": ["bin/calc"],
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/"
+    }
+  }
+}

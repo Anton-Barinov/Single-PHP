@@ -1,0 +1,25 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Single-PHP — Compile PHP applications into single executable binaries
+ * Copyright (c) 2026 Anton Barinov (https://github.com/Anton-Barinov)
+ */
+
+declare(strict_types=1);
+
+// Automatic re-exec with phar.readonly=0 if needed
+if (ini_get('phar.readonly') === '1' && !getenv('SINGLE_PHP_REEXEC')) {
+    putenv('SINGLE_PHP_REEXEC=1');
+    $cmd = escapeshellcmd(PHP_BINARY) . ' -d phar.readonly=0 ' . escapeshellarg(__FILE__);
+    foreach (array_slice($argv, 1) as $arg) {
+        $cmd .= ' ' . escapeshellarg($arg);
+    }
+    passthru($cmd, $exitCode);
+    exit($exitCode);
+}
+
+require_once __DIR__ . '/../src/autoload.php';
+
+$app = new \SinglePhp\Application();
+$status = $app->run($argv);
+exit($status);

@@ -1,0 +1,47 @@
+{
+  "name": "anton-barinov/single-php",
+  "description": "Compile any PHP application or Composer project into a single executable binary (Linux/macOS/Windows) with zero runtime dependencies.",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "php",
+    "compiler",
+    "packager",
+    "standalone",
+    "binary",
+    "micro-sapi",
+    "static-php",
+    "frankenphp",
+    "phar",
+    "single-binary",
+    "go-like"
+  ],
+  "authors": [
+    {
+      "name": "Anton Barinov",
+      "email": "55404783+Anton-Barinov@users.noreply.github.com",
+      "homepage": "https://github.com/Anton-Barinov"
+    }
+  ],
+  "homepage": "https://github.com/Anton-Barinov/Single-PHP",
+  "support": {
+    "issues": "https://github.com/Anton-Barinov/Single-PHP/issues",
+    "source": "https://github.com/Anton-Barinov/Single-PHP"
+  },
+  "require": {
+    "php": ">=8.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "SinglePhp\\": "src/"
+    },
+    "files": [
+      "src/autoload.php"
+    ]
+  },
+  "bin": [
+    "bin/single-php"
+  ],
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

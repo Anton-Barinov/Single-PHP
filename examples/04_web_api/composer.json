@@ -1,0 +1,6 @@
+{
+  "name": "acme/micro-web-api",
+  "description": "Standalone Web API server packaged with Single-PHP",
+  "version": "1.0.0",
+  "bin": ["index.php"]
+}

@@ -1,0 +1,9 @@
+vendor/
+composer.lock
+dist/
+build/
+*.phar
+*.sqlite
+.DS_Store
+.idea/
+.vscode/

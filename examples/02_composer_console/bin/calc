@@ -1,0 +1,21 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+require_once __DIR__ . '/../src/Calculator.php';
+
+use App\Calculator;
+
+$op = $argv[1] ?? 'add';
+$a = (float)($argv[2] ?? 10);
+$b = (float)($argv[3] ?? 5);
+
+try {
+    $result = Calculator::compute($op, $a, $b);
+    echo "Calculator Result: {$a} {$op} {$b} = {$result}\n";
+    exit(0);
+} catch (\Throwable $e) {
+    fwrite(STDERR, "Error: " . $e->getMessage() . "\n");
+    exit(1);
+}

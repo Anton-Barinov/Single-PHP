@@ -1,0 +1,6 @@
+{
+  "name": "acme/sqlite-tool",
+  "description": "Standalone SQLite DB Manager packaged with Single-PHP",
+  "version": "1.0.0",
+  "bin": ["db_tool.php"]
+}

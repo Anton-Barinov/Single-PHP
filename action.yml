@@ -1,0 +1,60 @@
+name: 'Single-PHP Compiler'
+description: 'Compile any PHP application or Composer project into a single executable binary.'
+author: 'Anton Barinov'
+branding:
+  icon: 'package'
+  color: 'purple'
+
+inputs:
+  path:
+    description: 'Project root directory to package'
+    required: false
+    default: '.'
+  output:
+    description: 'Destination path for compiled binary'
+    required: false
+  entrypoint:
+    description: 'Custom entrypoint script relative to project root'
+    required: false
+  engine:
+    description: 'Packaging engine: micro (default), franken, or phar'
+    required: false
+    default: 'micro'
+  target:
+    description: 'Target architecture: host, linux-x86_64, linux-aarch64, macos-arm64, macos-x86_64'
+    required: false
+    default: 'host'
+
+outputs:
+  binary:
+    description: 'Absolute path to the compiled executable binary'
+    value: ${{ steps.build.outputs.binary }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup PHP Environment
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        ini-values: phar.readonly=0
+
+    - name: Compile Standalone Binary
+      id: build
+      shell: bash
+      run: |
+        ARGS=""
+        if [ -n "${{ inputs.output }}" ]; then
+          ARGS="$ARGS --output=${{ inputs.output }}"
+        fi
+        if [ -n "${{ inputs.entrypoint }}" ]; then
+          ARGS="$ARGS --entrypoint=${{ inputs.entrypoint }}"
+        fi
+        if [ -n "${{ inputs.engine }}" ]; then
+          ARGS="$ARGS --engine=${{ inputs.engine }}"
+        fi
+        if [ -n "${{ inputs.target }}" ]; then
+          ARGS="$ARGS --target=${{ inputs.target }}"
+        fi
+
+        ${{ github.action_path }}/bin/single-php build ${{ inputs.path }} $ARGS
